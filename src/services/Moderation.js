@@ -11,8 +11,9 @@ class ModerationService {
    * @param {string} moderatorId Moderator user ID
    * @param {string} action Moderation action (BAN, WARN, MUTE, etc)
    * @param {string} reason Reason for the action
+   * @param {Date} [expiresAt] Optional expiration date for temporary actions
    */
-  async createCase(client, guild, targetId, moderatorId, action, reason) {
+  async createCase(client, guild, targetId, moderatorId, action, reason, expiresAt = null) {
     try {
       const lastCase = await Case
         .findOne({ guildId: guild.id })
@@ -28,7 +29,8 @@ class ModerationService {
         moderatorId,
         action,
         reason,
-        timestamp: new Date()
+        timestamp: new Date(),
+        expiresAt // now included
       });
 
       Logger.info(

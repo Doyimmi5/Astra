@@ -1,8 +1,14 @@
-const { Client, Collection, GatewayIntentBits, Partials } = require('discord.js');
+const {
+  Client,
+  Collection,
+  GatewayIntentBits,
+  Partials
+} = require('discord.js');
+
 const Database = require('../services/Database');
 const Locales = require('../services/Locales');
 const Logger = require('../services/Logger');
-const { loadHandlers } = require('../handlers/EventHandler');
+const TaskScheduler = require('../services/TaskScheduler');
 
 class BotClient extends Client {
   constructor() {
@@ -11,34 +17,51 @@ class BotClient extends Client {
         GatewayIntentBits.Guilds,
         GatewayIntentBits.GuildMessages,
         GatewayIntentBits.MessageContent,
-        GatewayIntentBits.GuildMembers,
+        GatewayIntentBits.GuildMembers
       ],
-      partials: [Partials.Message, Partials.Channel, Partials.User],
+      partials: [
+        Partials.Message,
+        Partials.Channel,
+        Partials.User
+      ]
     });
 
-    // Collections
+    // Command collections
     this.prefixCommands = new Collection();
     this.aliases = new Collection();
     this.slashCommands = new Collection();
     this.contextCommands = new Collection();
     this.cooldowns = new Collection();
-    
-    // Config Caches
+
+    // Guild config cache
     this.configCache = new Map();
   }
 
   async start() {
-    // 1. Load Services
-    Locales.load();
-    await Database.connect(process.env.MONGO_URI);
+    try {
+      // Load services
+      Locales.load();
+      await Database.connect(process.env.MONGO_URI);
 
-    // 2. Load Handlers
-    require('../handlers/CommandHandler')(this);
-    require('../handlers/EventHandler')(this);
+      // Load handlers
+      require('../handlers/CommandHandler')(this);
+      require('../handlers/EventHandler')(this);
 
-    // 3. Login
-    await this.login(process.env.DISCORD_TOKEN);
+      // Login
+      await this.login(process.env.DISCORD_TOKEN);
+
+      // Start scheduler AFTER bot is ready
+      this.once('ready', () => {
+        Logger.info('[Scheduler] Starting task scheduler');
+        TaskScheduler.start(this);
+      });
+
+    } catch (error) {
+      Logger.error('[Client] Failed to start bot', error);
+      process.exit(1);
+    }
   }
 }
 
 module.exports = BotClient;
+

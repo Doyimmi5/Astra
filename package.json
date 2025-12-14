@@ -3,19 +3,20 @@
   "version": "1.0.0",
   "main": "src/index.js",
   "scripts": {
-  "start": "node src/index.js",
-  "dev": "nodemon src/index.js",
-  "lint": "eslint .",
-  "lint:fix": "eslint . --fix",
-  "docker:up": "docker-compose up -d",
-  "docker:down": "docker-compose down"
+    "start": "node src/index.js",
+    "dev": "nodemon src/index.js",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "docker:up": "docker-compose up -d",
+    "docker:down": "docker-compose down"
   },
   "dependencies": {
     "discord.js": "^14.14.0",
     "dotenv": "^16.3.1",
     "glob": "^10.3.10",
     "moment": "^2.30.1",
-    "mongoose": "^8.0.3"
+    "mongoose": "^8.0.3",
+    "ms": "^2.1.3"
   },
   "devDependencies": {
     "eslint": "^9.39.2",
