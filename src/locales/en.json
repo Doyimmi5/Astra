@@ -1,0 +1,6 @@
+{
+  "NO_PERMISSION": "❌ You do not have permission to use this command.",
+  "COOLDOWN_ACTIVE": "⏳ Please wait {{time}} more seconds.",
+  "ERROR_GENERIC": "⚠ An error occurred while executing this command.",
+  "PONG": "🏓 Pong! Latency is {{latency}}ms."
+}
