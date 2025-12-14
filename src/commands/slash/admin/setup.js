@@ -1,9 +1,4 @@
-const {
-  SlashCommandBuilder,
-  ChannelType,
-  PermissionFlagsBits
-} = require('discord.js');
-
+const { SlashCommandBuilder, ChannelType, PermissionFlagsBits } = require('discord.js');
 const GuildConfig = require('../../../database/schemas/GuildConfig');
 const Logger = require('../../../services/Logger');
 
@@ -11,15 +6,14 @@ module.exports = {
   data: new SlashCommandBuilder()
     .setName('setup')
     .setDescription('Configure server settings')
-    .setDefaultMemberPermissions(PermissionFlagsBits.Administrator)
+    .setDefaultMemberPermissions(PermissionFlagsBits.Administrator) // Admins Only
     .addSubcommand(subcommand =>
       subcommand
         .setName('logs')
         .setDescription('Set the moderation log channel')
         .addChannelOption(option =>
-          option
-            .setName('channel')
-            .setDescription('The channel where moderation logs will be sent')
+          option.setName('channel')
+            .setDescription('The channel where logs will be sent')
             .addChannelTypes(ChannelType.GuildText)
             .setRequired(true)
         )
@@ -31,7 +25,7 @@ module.exports = {
         .addStringOption(option =>
           option
             .setName('lang')
-            .setDescription('Language code')
+            .setDescription('The language code (e.g., en, pt)')
             .setRequired(true)
             .addChoices(
               { name: 'English', value: 'en' },
@@ -40,67 +34,56 @@ module.exports = {
         )
     ),
 
-  /**
-   * @param {ChatInputCommandInteraction} interaction
-   * @param {Client} client
-   */
-  async execute(interaction, client) {
+  async execute(interaction, client, config) {
     const subcommand = interaction.options.getSubcommand();
 
     try {
       if (subcommand === 'logs') {
         const channel = interaction.options.getChannel('channel');
 
+        // 1. Update Database (MongoDB)
+        // new: true returns the modified document
+        // upsert: true creates the document if it doesn't exist
         const newConfig = await GuildConfig.findOneAndUpdate(
           { guildId: interaction.guildId },
-          { $set: { logChannelId: channel.id } },
+          { logChannelId: channel.id },
           { new: true, upsert: true }
-        ).lean();
+        );
 
+        // 2. Update In-Memory Cache (Immediate Performance)
         client.configCache.set(interaction.guildId, newConfig);
 
-        await interaction.reply({
+        await interaction.reply({ 
           content: `✅ **Success!** Moderation logs will now be sent to ${channel}.`,
-          ephemeral: true
+          ephemeral: true 
         });
-
-        Logger.info(
-          `[Setup] Guild ${interaction.guildId} updated log channel to ${channel.id}`
-        );
+        
+        Logger.info(`Guild ${interaction.guildId} updated log channel to ${channel.id}`);
       }
 
-      if (subcommand === 'language') {
+      else if (subcommand === 'language') {
         const lang = interaction.options.getString('lang');
 
         const newConfig = await GuildConfig.findOneAndUpdate(
           { guildId: interaction.guildId },
-          { $set: { language: lang } },
+          { language: lang },
           { new: true, upsert: true }
-        ).lean();
+        );
 
         client.configCache.set(interaction.guildId, newConfig);
 
-        await interaction.reply({
-          content: `✅ **Success!** Bot language has been set to \`${lang}\`.`,
-          ephemeral: true
+        await interaction.reply({ 
+          content: `✅ **Success!** Language set to \`${lang}\`.`,
+          ephemeral: true 
         });
-
-        Logger.info(
-          `[Setup] Guild ${interaction.guildId} updated language to ${lang}`
-        );
       }
+
     } catch (error) {
-      Logger.error(
-        `[Setup] Error while executing setup command | Guild: ${interaction.guildId}`,
-        error
-      );
-
-      if (!interaction.replied) {
-        await interaction.reply({
-          content: '❌ An error occurred while saving the settings.',
-          ephemeral: true
-        });
-      }
+      Logger.error(`Error in setup command for guild ${interaction.guildId}`, error);
+      await interaction.reply({ 
+        content: '❌ An error occurred while saving configuration.', 
+        ephemeral: true 
+      });
     }
-  }
+  },
 };
