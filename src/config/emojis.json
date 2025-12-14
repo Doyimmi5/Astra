@@ -1,0 +1,45 @@
+{
+  "cute": {
+    "heart": "💖",
+    "sparkles": "✨",
+    "cherry_blossom": "🌸",
+    "two_hearts": "💕",
+    "unicorn": "🦄",
+    "rainbow": "🌈",
+    "star": "💫",
+    "ribbon": "🎀"
+  },
+  "moderation": {
+    "ban": "🔨",
+    "kick": "👢",
+    "mute": "🤐",
+    "unmute": "🗣️",
+    "warn": "⚠️",
+    "clear": "🧹",
+    "lock": "🔒",
+    "unlock": "🔓",
+    "slowmode": "🐌",
+    "prune": "🗑️"
+  },
+  "status": {
+    "success": "✅",
+    "error": "❌",
+    "warning": "⚠️",
+    "info": "ℹ️",
+    "loading": "⏳",
+    "online": "🟢",
+    "offline": "🔴",
+    "idle": "🟡",
+    "dnd": "⛔"
+  },
+  "utility": {
+    "search": "🔍",
+    "settings": "⚙️",
+    "stats": "📊",
+    "help": "❓",
+    "ping": "🏓",
+    "uptime": "⏰",
+    "memory": "💾",
+    "cpu": "🖥️"
+  }
+}

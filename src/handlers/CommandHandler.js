@@ -1,37 +1,84 @@
-const { glob } = require('glob');
-const path = require('path');
-const Logger = require('../services/Logger');
+import { Collection } from 'discord.js';
+import { readdirSync } from 'fs';
+import { pathToFileURL } from 'url';
+import path from 'path';
+import fsExtra from 'fs-extra';
+import klaw from 'klaw';
+import AsciiTable from 'ascii-table';
 
-module.exports = async (client) => {
-  // 1. Prefix Commands
-  const prefixFiles = await glob(`${process.cwd()}/src/commands/prefix/**/*.js`);
-  prefixFiles.forEach((file) => {
-    const command = require(file);
-    if (command.name) {
-      client.prefixCommands.set(command.name, command);
-      if (command.aliases && Array.isArray(command.aliases)) {
-        command.aliases.forEach(alias => client.aliases.set(alias, command.name));
-      }
+export default class CommandHandler {
+    constructor(client) {
+        this.client = client;
+        this.commands = new Collection();
     }
-  });
 
-  // 2. Slash Commands
-  const slashFiles = await glob(`${process.cwd()}/src/commands/slash/**/*.js`);
-  slashFiles.forEach((file) => {
-    const command = require(file);
-    if (command.data) {
-      client.slashCommands.set(command.data.name, command);
+    async load() {
+        const commandsPath = path.join(process.cwd(), 'src', 'commands');
+        
+        if (!fsExtra.existsSync(commandsPath)) {
+            this.client.log('Commands directory not found, creating...', 'warn');
+            fsExtra.ensureDirSync(commandsPath);
+            return;
+        }
+
+        const table = new AsciiTable('Commands');
+        table.setHeading('Command', 'Status', 'Category');
+
+        let loadedCount = 0;
+        let failedCount = 0;
+
+        for await (const file of klaw(commandsPath)) {
+            if (!file.path.endsWith('.js') || file.stats.isDirectory()) continue;
+            
+            // Skip prefix commands in this handler
+            if (file.path.includes('/prefix/')) continue;
+
+            try {
+                const commandModule = await import(pathToFileURL(file.path).href);
+                const command = commandModule.default;
+
+                if (!command || typeof command.execute !== 'function') {
+                    table.addRow(path.basename(file.path), '❌ Invalid', 'N/A');
+                    failedCount++;
+                    continue;
+                }
+
+                this.client.commands.set(command.name, command);
+                table.addRow(command.name, '✅ Loaded', command.category || 'General');
+                loadedCount++;
+
+            } catch (error) {
+                table.addRow(path.basename(file.path), '❌ Error', 'N/A');
+                this.client.log(`Failed to load command ${file.path}: ${error.message}`, 'error');
+                failedCount++;
+            }
+        }
+
+        this.client.log(`Loaded ${loadedCount} commands, ${failedCount} failed`, 'info');
     }
-  });
 
-  // 3. Context Menu Commands
-  const contextFiles = await glob(`${process.cwd()}/src/commands/context/**/*.js`);
-  contextFiles.forEach((file) => {
-    const command = require(file);
-    if (command.data) {
-      client.contextCommands.set(command.data.name, command);
+    async reload(commandName) {
+        const command = this.client.commands.get(commandName);
+        if (!command) return false;
+
+        try {
+            delete require.cache[require.resolve(`../commands/${command.category}/${commandName}.js`)];
+            const newCommand = require(`../commands/${command.category}/${commandName}.js`);
+            
+            this.client.commands.set(commandName, newCommand);
+            this.client.log(`Reloaded command: ${commandName}`, 'success');
+            return true;
+        } catch (error) {
+            this.client.log(`Failed to reload command ${commandName}: ${error.message}`, 'error');
+            return false;
+        }
     }
-  });
 
-  Logger.info(`Loaded ${client.prefixCommands.size} prefix, ${client.slashCommands.size} slash, ${client.contextCommands.size} context commands.`);
-};
+    getCommands() {
+        return this.client.commands;
+    }
+
+    getCommandsByCategory(category) {
+        return this.client.commands.filter(cmd => cmd.category === category);
+    }
+}

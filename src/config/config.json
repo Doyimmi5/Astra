@@ -1,0 +1,50 @@
+{
+  "colors": {
+    "primary": "#FF69B4",
+    "secondary": "#FFB6C1",
+    "success": "#98FB98",
+    "warning": "#FFD700",
+    "error": "#FF6B6B",
+    "info": "#87CEEB",
+    "mute": "#FFA500",
+    "ban": "#DC143C",
+    "kick": "#FF4500"
+  },
+  "emojis": {
+    "success": "✨",
+    "error": "💔",
+    "warning": "⚠️",
+    "info": "💖",
+    "loading": "🌸",
+    "ban": "🔨",
+    "kick": "👢",
+    "mute": "🤐",
+    "unmute": "🗣️",
+    "warn": "⚠️",
+    "clear": "🧹",
+    "lock": "🔒",
+    "unlock": "🔓",
+    "slowmode": "🐌",
+    "prune": "🗑️"
+  },
+  "limits": {
+    "maxWarns": 3,
+    "muteTime": 600000,
+    "cooldown": 3000,
+    "maxBulkDelete": 100,
+    "maxSlowmode": 21600,
+    "maxTimeout": 2419200000
+  },
+  "permissions": {
+    "admin": ["Administrator"],
+    "moderator": ["ModerateMembers", "ManageMessages", "KickMembers", "BanMembers"],
+    "helper": ["ManageMessages", "ModerateMembers"]
+  },
+  "footers": [
+    "Made with 💖 by Astra",
+    "Keeping servers cute and safe! uwu",
+    "Moderation made adorable ~",
+    "Your friendly femboy moderator! >.<",
+    "Protecting with love and care 💕"
+  ]
+}

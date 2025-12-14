@@ -1,0 +1,51 @@
+{
+  "permissions": {
+    "owner": {
+      "level": 10,
+      "users": ["1333518488777523274"],
+      "permissions": ["*"]
+    },
+    "subowner": {
+      "level": 9,
+      "roles": ["Sub Owner", "Co-Owner"],
+      "roleIds": [],
+      "permissions": ["maintenance", "eval", "restart", "reload"]
+    },
+    "admin": {
+      "level": 8,
+      "roles": ["Admin", "Administrator"],
+      "roleIds": [],
+      "permissions": ["ban", "kick", "mute", "warn", "clear", "lockdown", "prune"]
+    },
+    "manager": {
+      "level": 7,
+      "roles": ["Manager", "Staff Manager"],
+      "roleIds": [],
+      "permissions": ["ban", "kick", "mute", "warn", "clear", "role"]
+    },
+    "dev": {
+      "level": 6,
+      "roles": ["Developer", "Dev"],
+      "roleIds": [],
+      "permissions": ["eval", "reload", "debug"]
+    },
+    "mod": {
+      "level": 5,
+      "roles": ["Moderator", "Mod"],
+      "roleIds": [],
+      "permissions": ["kick", "mute", "warn", "clear", "slowmode"]
+    },
+    "helper": {
+      "level": 4,
+      "roles": ["Helper", "Support"],
+      "roleIds": [],
+      "permissions": ["warn", "clear", "slowmode"]
+    },
+    "tester": {
+      "level": 3,
+      "roles": ["Tester", "Beta Tester"],
+      "roleIds": [],
+      "permissions": ["debug", "test"]
+    }
+  }
+}

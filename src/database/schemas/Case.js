@@ -1,74 +1,78 @@
-const mongoose = require('mongoose');
+import mongoose from 'mongoose';
+import { v4 as uuidv4 } from 'uuid';
+import validator from 'validator';
 
-const CaseSchema = new mongoose.Schema(
-  {
-    guildId: {
-      type: String,
-      required: true,
-      index: true
-    },
-
+const caseSchema = new mongoose.Schema({
     caseId: {
-      type: Number,
-      required: true
+        type: String,
+        default: () => uuidv4(),
+        unique: true,
+        validate: {
+            validator: (v) => validator.isUUID(v),
+            message: 'Invalid UUID format'
+        }
     },
-
-    targetId: {
-      type: String,
-      required: true,
-      index: true
+    guildId: {
+        type: String,
+        required: true,
+        validate: {
+            validator: (v) => /^\d{17,19}$/.test(v),
+            message: 'Invalid guild ID'
+        }
     },
-
+    userId: {
+        type: String,
+        required: true,
+        validate: {
+            validator: (v) => /^\d{17,19}$/.test(v),
+            message: 'Invalid user ID'
+        }
+    },
     moderatorId: {
-      type: String,
-      required: true
+        type: String,
+        required: true,
+        validate: {
+            validator: (v) => /^\d{17,19}$/.test(v),
+            message: 'Invalid moderator ID'
+        }
     },
-
-    action: {
-      type: String,
-      required: true,
-      enum: [
-        'WARN',
-        'KICK',
-        'BAN',
-        'UNBAN',
-        'MUTE',
-        'UNMUTE',
-        'TEMPBAN',
-        'TEMPMUTE'
-      ]
+    type: {
+        type: String,
+        enum: ['ban', 'kick', 'mute', 'warn', 'unmute', 'unban', 'softban', 'timeout', 'lockdown', 'slowmode'],
+        required: true
     },
-
     reason: {
-      type: String,
-      default: 'No reason provided'
+        type: String,
+        default: 'No reason provided',
+        maxlength: 512
     },
-
-    timestamp: {
-      type: Date,
-      default: Date.now
+    duration: {
+        type: Number,
+        default: null
     },
-
-    expiresAt: {
-      type: Date,
-      default: null,
-      index: true
-    },
-
     active: {
-      type: Boolean,
-      default: true
+        type: Boolean,
+        default: true
+    },
+    evidence: {
+        type: String,
+        default: null,
+        validate: {
+            validator: function(v) {
+                return !v || validator.isURL(v);
+            },
+            message: 'Evidence must be a valid URL'
+        }
+    },
+    expiresAt: {
+        type: Date,
+        default: null
     }
-  },
-  {
-    versionKey: false
-  }
-);
+}, {
+    timestamps: true
+});
 
-// Compound index for fast user history lookups
-CaseSchema.index({ guildId: 1, targetId: 1 });
+caseSchema.index({ guildId: 1, userId: 1 });
+caseSchema.index({ expiresAt: 1 }, { expireAfterSeconds: 0 });
 
-// Optional: ensure caseId uniqueness per guild
-CaseSchema.index({ guildId: 1, caseId: 1 }, { unique: true });
-
-module.exports = mongoose.model('Case', CaseSchema);
+export default mongoose.model('Case', caseSchema);

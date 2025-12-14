@@ -1,0 +1,31 @@
+{
+  "channels": {
+    "moderation": null,
+    "messages": null,
+    "members": null,
+    "server": null,
+    "voice": null
+  },
+  "events": {
+    "messageDelete": true,
+    "messageUpdate": true,
+    "memberJoin": true,
+    "memberLeave": true,
+    "memberUpdate": true,
+    "roleCreate": true,
+    "roleDelete": true,
+    "roleUpdate": true,
+    "channelCreate": true,
+    "channelDelete": true,
+    "channelUpdate": true,
+    "voiceStateUpdate": true,
+    "guildBanAdd": true,
+    "guildBanRemove": true
+  },
+  "settings": {
+    "enabled": true,
+    "embedColor": "#FF69B4",
+    "includeAttachments": true,
+    "logBots": false
+  }
+}

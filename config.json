@@ -1,0 +1,40 @@
+{
+  "bot": {
+    "name": "Astra",
+    "version": "1.0.0",
+    "description": "Cute Femboy Moderation Bot",
+    "prefix": "!",
+    "ownerIds": [],
+    "testGuildId": ""
+  },
+  "database": {
+    "name": "astra",
+    "options": {
+      "useNewUrlParser": true,
+      "useUnifiedTopology": true
+    }
+  },
+  "logging": {
+    "level": "info",
+    "maxFiles": 5,
+    "maxSize": "10m"
+  },
+  "moderation": {
+    "automod": {
+      "enabled": true,
+      "antiSpam": true,
+      "antiRaid": true,
+      "autoDelete": true
+    },
+    "punishments": {
+      "warnThreshold": 3,
+      "muteTime": 600000,
+      "tempbanTime": 86400000
+    }
+  },
+  "features": {
+    "sharding": false,
+    "maintenance": false,
+    "devMode": false
+  }
+}
